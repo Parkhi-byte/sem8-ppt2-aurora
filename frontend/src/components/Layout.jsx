@@ -1,6 +1,6 @@
 import React from 'react';
 import Header from './Header';
-import { Sparkles, Users, Info, CreditCard } from 'lucide-react';
+import { Sparkles, Users, Info, CreditCard, MessageCircle, Video, FileText, Kanban, Mail, LifeBuoy, ArrowRight, Shield, Lock, FileQuestion } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -45,34 +45,86 @@ const Layout = ({ children }) => {
             </div>
             <div>
               <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Product</h4>
-              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <li><Link to="/chat" className="hover:text-aurora-600 dark:hover:text-aurora-400">Chat</Link></li>
-                <li><Link to="/video-call" className="hover:text-aurora-600 dark:hover:text-aurora-400">Video Calls</Link></li>
-                <li><Link to="/document-share" className="hover:text-aurora-600 dark:hover:text-aurora-400">Documents</Link></li>
-                <li><Link to="/kanban" className="hover:text-aurora-600 dark:hover:text-aurora-400">Boards</Link></li>
+              <ul className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                <li>
+                  <Link to="/chat" className="flex items-center space-x-2 hover:text-aurora-600 dark:hover:text-aurora-400 transition-colors">
+                    <MessageCircle size={16} className="shrink-0" />
+                    <span>Chat</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/video-call" className="flex items-center space-x-2 hover:text-aurora-600 dark:hover:text-aurora-400 transition-colors">
+                    <Video size={16} className="shrink-0" />
+                    <span>Video Calls</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/document-share" className="flex items-center space-x-2 hover:text-aurora-600 dark:hover:text-aurora-400 transition-colors">
+                    <FileText size={16} className="shrink-0" />
+                    <span>Documents</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/kanban" className="flex items-center space-x-2 hover:text-aurora-600 dark:hover:text-aurora-400 transition-colors">
+                    <Kanban size={16} className="shrink-0" />
+                    <span>Boards</span>
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Company</h4>
-              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <li><Link to="/pricing" className="hover:text-aurora-600 dark:hover:text-aurora-400">Pricing</Link></li>
-                <li><Link to="/about" className="hover:text-aurora-600 dark:hover:text-aurora-400">About Us</Link></li>
-                <li><a href="mailto:sales@aurora.example.com" className="hover:text-aurora-600 dark:hover:text-aurora-400">Sales</a></li>
-                <li><a href="mailto:support@aurora.example.com" className="hover:text-aurora-600 dark:hover:text-aurora-400">Support</a></li>
+              <ul className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                <li>
+                  <Link to="/pricing" className="flex items-center space-x-2 hover:text-aurora-600 dark:hover:text-aurora-400 transition-colors">
+                    <CreditCard size={16} className="shrink-0" />
+                    <span>Pricing</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/about" className="flex items-center space-x-2 hover:text-aurora-600 dark:hover:text-aurora-400 transition-colors">
+                    <Info size={16} className="shrink-0" />
+                    <span>About Us</span>
+                  </Link>
+                </li>
+                <li>
+                  <a href="mailto:sales@aurora.example.com" className="flex items-center space-x-2 hover:text-aurora-600 dark:hover:text-aurora-400 transition-colors">
+                    <Mail size={16} className="shrink-0" />
+                    <span>Sales</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="mailto:support@aurora.example.com" className="flex items-center space-x-2 hover:text-aurora-600 dark:hover:text-aurora-400 transition-colors">
+                    <LifeBuoy size={16} className="shrink-0" />
+                    <span>Support</span>
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Get Started</h4>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Try Pro features with a 14-day free trial.</p>
-              <Link to="/pricing" className="inline-block px-4 py-2 rounded-lg bg-aurora-600 hover:bg-aurora-700 text-white text-sm">View Pricing</Link>
+              <Link to="/pricing" className="inline-flex items-center px-4 py-2 rounded-lg bg-aurora-600 hover:bg-aurora-700 text-white text-sm transition-colors shadow-sm hover:shadow-md">
+                <span>View Pricing</span>
+                <ArrowRight size={16} className="ml-2" />
+              </Link>
             </div>
           </div>
           <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 text-sm text-gray-500 dark:text-gray-400 flex flex-col md:flex-row items-center justify-between gap-3">
             <div>© 2024 Aurora. All rights reserved.</div>
-            <div className="flex items-center gap-4">
-              <a href="#" className="hover:text-aurora-600 dark:hover:text-aurora-400">Terms</a>
-              <a href="#" className="hover:text-aurora-600 dark:hover:text-aurora-400">Privacy</a>
-              <a href="#" className="hover:text-aurora-600 dark:hover:text-aurora-400">Security</a>
+            <div className="flex items-center gap-6">
+              <a href="#" className="flex items-center space-x-1.5 hover:text-aurora-600 dark:hover:text-aurora-400 transition-colors">
+                <FileQuestion size={14} />
+                <span>Terms</span>
+              </a>
+              <a href="#" className="flex items-center space-x-1.5 hover:text-aurora-600 dark:hover:text-aurora-400 transition-colors">
+                <Lock size={14} />
+                <span>Privacy</span>
+              </a>
+              <a href="#" className="flex items-center space-x-1.5 hover:text-aurora-600 dark:hover:text-aurora-400 transition-colors">
+                <Shield size={14} />
+                <span>Security</span>
+              </a>
             </div>
           </div>
         </div>

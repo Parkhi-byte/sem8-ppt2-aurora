@@ -1,89 +1,99 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import Stripe from 'stripe';
+
+import connectDB from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
+import taskRoutes from './routes/taskRoutes.js';
+import teamRoutes from './routes/teamRoutes.js';
+import documentRoutes from './routes/documentRoutes.js';
+import passwordRoutes from './routes/passwordRoutes.js';
+import masterRoutes from './routes/masterRoutes.js';
 
 dotenv.config();
 
+// Connect to database
+try {
+  await connectDB();
+  console.log('Database connected successfully');
+} catch (err) {
+  console.error('Database connection failed:', err);
+  process.exit(1);
+}
+
+if (!process.env.JWT_SECRET) {
+  console.warn('WARNING: JWT_SECRET is not defined in .env. Auth will fail.');
+}
+
+import http from 'http';
+import { Server } from 'socket.io';
+
+import { setupSocket } from './socket/socketHandler.js';
+
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
+});
+
 const port = process.env.PORT || 4000;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // CORS for local dev frontend
 app.use(cors({ origin: true }));
 
-// Stripe needs raw body for webhook signature verification
-app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  const stripeSecret = process.env.STRIPE_SECRET_KEY;
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  const stripe = stripeSecret ? new Stripe(stripeSecret) : null;
-
-  if (!stripe || !webhookSecret) {
-    return res.status(200).send('Webhook not configured');
-  }
-
-  const sig = req.headers['stripe-signature'];
-  let event;
-  try {
-    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
-  } catch (err) {
-    console.error('Webhook signature verification failed:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-
-  switch (event.type) {
-    case 'checkout.session.completed':
-      // TODO: provision user/org access based on session
-      console.log('Checkout completed:', event.data.object.id);
-      break;
-    default:
-      console.log(`Unhandled event type ${event.type}`);
-  }
-
-  res.json({ received: true });
-});
-
-// JSON body after webhook route so it doesn't interfere
+// JSON body
 app.use(express.json());
 
-// Create Stripe checkout session endpoint
-app.post('/create-checkout-session', async (req, res) => {
-  const stripeSecret = process.env.STRIPE_SECRET_KEY;
-  const stripe = stripeSecret ? new Stripe(stripeSecret) : null;
+// Initialize Socket Logic
+setupSocket(io);
 
-  if (!stripe) {
-    return res.status(500).json({ error: 'Stripe not configured' });
-  }
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/tasks', taskRoutes);
+app.use('/api/team', teamRoutes);
+app.use('/api/documents', documentRoutes);
+app.use('/api/passwords', passwordRoutes);
+app.use('/api/master', masterRoutes);
 
-  try {
-    const { priceId } = req.body;
-    if (!priceId) {
-      return res.status(400).json({ error: 'Price ID is required' });
-    }
+// Serve Frontend in Production
+if (process.env.NODE_ENV === 'production') {
+  const frontendPath = path.join(__dirname, '../../frontend/dist');
+  app.use(express.static(frontendPath));
 
-    const session = await stripe.checkout.sessions.create({
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
-      success_url: `${req.headers.origin || 'http://localhost:5173'}/?checkout=success`,
-      cancel_url: `${req.headers.origin || 'http://localhost:5173'}/pricing?checkout=cancelled`,
-    });
+  app.get('*', (req, res) =>
+    res.sendFile(path.resolve(frontendPath, 'index.html'))
+  );
+} else {
+  app.get('/', (req, res) => {
+    res.send('API is running...');
+  });
+}
 
-    res.json({ sessionId: session.id, url: session.url });
-  } catch (error) {
-    console.error('Error creating checkout session:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
+
 
 app.get('/health', (_req, res) => {
   res.json({ ok: true, uptime: process.uptime() });
 });
 
-app.listen(port, () => {
+// Error Handling Middleware
+app.use((err, req, res, next) => {
+  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  res.status(statusCode);
+  res.json({
+    message: err.message,
+    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+  });
+});
+
+server.listen(port, () => {
   console.log(`Backend listening on http://localhost:${port}`);
 });
 

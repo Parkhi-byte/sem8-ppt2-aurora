@@ -32,7 +32,7 @@ const About = () => {
       icon: Award,
       title: 'Excellence',
       description: 'We strive for perfection in every line of code and every pixel of design.',
-      color: 'bg-orange-500'
+      color: 'bg-indigo-500'
     }
   ];
 

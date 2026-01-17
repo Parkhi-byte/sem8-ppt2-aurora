@@ -1,21 +1,28 @@
 import React from 'react';
+import { Toaster } from 'sonner';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
-import Login from './pages/Login';
-import SignUp from './pages/SignUp';
-import Home from './pages/Home';
-import VideoCall from './pages/VideoCall';
-import Chat from './pages/Chat';
-import DocumentShare from './pages/DocumentShare';
-import Notifications from './pages/Notifications';
-import TeamManagement from './pages/TeamManagement';
-import PasswordManager from './pages/PasswordManager';
-import Kanban from './pages/Kanban';
-import Pricing from './pages/Pricing';
-import About from './pages/About';
+import AdminRoute from './components/AdminRoute';
+import PageLoader from './components/PageLoader';
+
+const Login = React.lazy(() => import('./pages/Login'));
+const SignUp = React.lazy(() => import('./pages/SignUp'));
+const Home = React.lazy(() => import('./pages/Home'));
+const VideoCall = React.lazy(() => import('./pages/VideoCall'));
+const Chat = React.lazy(() => import('./pages/Chat'));
+const DocumentShare = React.lazy(() => import('./pages/DocumentShare'));
+const Notifications = React.lazy(() => import('./pages/Notifications'));
+const TeamManagement = React.lazy(() => import('./pages/TeamManagement'));
+const PasswordManager = React.lazy(() => import('./pages/PasswordManager'));
+const Kanban = React.lazy(() => import('./pages/Kanban'));
+const Pricing = React.lazy(() => import('./pages/Pricing'));
+const About = React.lazy(() => import('./pages/About'));
+const MasterDashboard = React.lazy(() => import('./pages/MasterDashboard'));
+const Profile = React.lazy(() => import('./pages/Profile'));
+import MasterRoute from './components/MasterRoute';
 import './index.css';
 
 // Public route wrapper (redirects to home if already logged in)
@@ -40,128 +47,152 @@ const PublicRoute = ({ children }) => {
   return children;
 };
 
+
 function AppRoutes() {
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route
-        path="/login"
-        element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          <PublicRoute>
-            <SignUp />
-          </PublicRoute>
-        }
-      />
+    <React.Suspense fallback={<PageLoader />}>
+      <Routes>
+        {/* Public Routes */}
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <SignUp />
+            </PublicRoute>
+          }
+        />
 
-      {/* Publicly accessible routes with Layout */}
-      <Route
-        path="/"
-        element={
-          <Layout>
-            <Home />
-          </Layout>
-        }
-      />
-      <Route
-        path="/about"
-        element={
-          <Layout>
-            <About />
-          </Layout>
-        }
-      />
-      <Route
-        path="/pricing"
-        element={
-          <Layout>
-            <Pricing />
-          </Layout>
-        }
-      />
+        {/* Publicly accessible routes with Layout */}
+        <Route
+          path="/"
+          element={
+            <Layout>
+              <Home />
+            </Layout>
+          }
+        />
+        <Route
+          path="/about"
+          element={
+            <Layout>
+              <About />
+            </Layout>
+          }
+        />
+        <Route
+          path="/pricing"
+          element={
+            <Layout>
+              <Pricing />
+            </Layout>
+          }
+        />
 
-      {/* Protected Routes */}
-      <Route
-        path="/video-call"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <VideoCall />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/chat"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <Chat />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/document-share"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <DocumentShare />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/notifications"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <Notifications />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/team-management"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <TeamManagement />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/password-manager"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <PasswordManager />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/kanban"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <Kanban />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
+        {/* Protected Routes */}
+        <Route
+          path="/video-call"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <VideoCall />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Chat />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/document-share"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <DocumentShare />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Notifications />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/team-management"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <TeamManagement />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Profile />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/password-manager"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <PasswordManager />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/kanban"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Kanban />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Default redirect */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route
+          path="/master-dashboard"
+          element={
+            <MasterRoute>
+              <Layout>
+                <MasterDashboard />
+              </Layout>
+            </MasterRoute>
+          }
+        />
+
+        {/* Default redirect */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </React.Suspense>
   );
 }
 
@@ -170,6 +201,7 @@ function App() {
     <ThemeProvider>
       <Router>
         <AuthProvider>
+          <Toaster position="top-center" richColors />
           <AppRoutes />
         </AuthProvider>
       </Router>

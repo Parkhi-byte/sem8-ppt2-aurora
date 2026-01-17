@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Video, MessageCircle, FileText, Home, Bell, Search, Menu, X, LogOut, Shield, Users, Lock, Sun, Moon, Sparkles, Kanban, Info, CreditCard, LogIn } from 'lucide-react';
+import { Video, MessageCircle, FileText, Home, Bell, Search, Menu, X, LogOut, Lock, Sun, Moon, Kanban, LogIn, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 
@@ -41,31 +41,37 @@ const Header = () => {
       path: '/video-call',
       icon: Video,
       label: 'Video Call',
-      color: 'from-blue-500 to-cyan-500'
+      color: 'from-aurora-500 to-purple-600'
     },
     {
       path: '/chat',
       icon: MessageCircle,
       label: 'Chat',
-      color: 'from-green-500 to-emerald-500'
+      color: 'from-aurora-500 to-purple-600'
     },
     {
       path: '/document-share',
       icon: FileText,
       label: 'Documents',
-      color: 'from-purple-500 to-pink-500'
+      color: 'from-aurora-500 to-purple-600'
     },
     {
       path: '/password-manager',
       icon: Lock,
       label: 'Passwords',
-      color: 'from-orange-500 to-red-500'
+      color: 'from-aurora-500 to-purple-600'
     },
     {
       path: '/kanban',
       icon: Kanban,
       label: 'Board',
-      color: 'from-indigo-500 to-violet-500'
+      color: 'from-aurora-500 to-purple-600'
+    },
+    {
+      path: '/team-management',
+      icon: Users,
+      label: 'Team',
+      color: 'from-aurora-500 to-purple-600'
     }
   ];
 
@@ -83,6 +89,15 @@ const Header = () => {
       color: 'from-blue-500 to-indigo-500'
     }
   ];
+
+  if (user?.role === 'master') {
+    navItems.push({
+      path: '/master-dashboard',
+      icon: Shield,
+      label: 'Master',
+      color: 'from-red-500 to-orange-500'
+    });
+  }
 
   const currentNavItems = user ? navItems : publicNavItems;
 
@@ -196,8 +211,14 @@ const Header = () => {
                   {showUserMenu && (
                     <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1 z-50 animate-fade-in">
                       <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.name}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{user?.email}</div>
+                        <Link
+                          to="/profile"
+                          onClick={() => setShowUserMenu(false)}
+                          className="block group cursor-pointer"
+                        >
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-aurora-600 dark:group-hover:text-aurora-400 transition-colors">{user?.name}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate group-hover:text-aurora-500 transition-colors">{user?.email}</div>
+                        </Link>
                       </div>
                       <button
                         onClick={handleLogout}

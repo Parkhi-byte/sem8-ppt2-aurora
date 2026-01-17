@@ -1,6 +1,5 @@
 import React from 'react';
-import { Check, Zap, Shield, CreditCard, Sparkles } from 'lucide-react';
-import { startCheckout } from '../services/payments';
+import { Check, Zap, Shield, CreditCard, Sparkles, ArrowRight, Mail } from 'lucide-react';
 
 const tiers = [
   {
@@ -32,7 +31,7 @@ const tiers = [
     ],
     highlight: true,
     cta: 'Upgrade to Pro',
-    priceId: import.meta.env.VITE_STRIPE_PRICE_PRO || null,
+    priceId: null,
     color: 'from-aurora-500 to-purple-600'
   },
   {
@@ -49,18 +48,16 @@ const tiers = [
     ],
     cta: 'Contact Sales',
     priceId: null,
-    color: 'from-orange-400 to-pink-500'
+    color: 'from-fuchsia-500 to-pink-500'
   }
 ];
 
 export default function Pricing() {
-  const handleSelect = async (tier) => {
-    if (tier.priceId) {
-      await startCheckout(tier.priceId);
-    } else if (tier.name === 'Free') {
-      window.location.href = '/signup';
-    } else {
+  const handleSelect = (tier) => {
+    if (tier.name === 'Enterprise') {
       window.location.href = 'mailto:sales@aurora.example.com?subject=Aurora Enterprise Inquiry';
+    } else {
+      window.location.href = '/signup';
     }
   };
 
@@ -129,7 +126,10 @@ export default function Pricing() {
                 : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                 }`}
             >
-              {tier.cta}
+              <div className="flex items-center justify-center space-x-2">
+                <span>{tier.cta}</span>
+                {tier.name === 'Enterprise' ? <Mail size={16} /> : <ArrowRight size={16} />}
+              </div>
             </button>
           </div>
         ))}
@@ -139,7 +139,7 @@ export default function Pricing() {
       <div className="mt-16 text-center">
         <div className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm">
           <Shield size={16} className="text-emerald-500" />
-          <span>Secure payments powered by Stripe. 30-day money-back guarantee.</span>
+          <span>Secure payments. 30-day money-back guarantee.</span>
         </div>
       </div>
     </div>

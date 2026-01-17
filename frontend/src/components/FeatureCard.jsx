@@ -5,30 +5,33 @@ import { ArrowRight } from 'lucide-react';
 const FeatureCard = ({ title, description, icon: Icon, path, color, iconBg, stats }) => {
   return (
     <Link to={path} className="block group">
-      <div className="relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 h-full overflow-hidden">
-        {/* Gradient Background Effect */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none`}></div>
+      <div className="relative glass-card rounded-2xl p-6 h-full overflow-hidden group">
+        {/* Subtle Gradient Glow */}
+        <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
 
-        <div className="relative z-10">
+        {/* Decorative Top Line */}
+        <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${color} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left`}></div>
+
+        <div className="relative z-10 flex flex-col h-full">
           {/* Icon */}
-          <div className={`w-14 h-14 bg-gradient-to-br ${iconBg || color} rounded-xl flex items-center justify-center mb-6 shadow-sm group-hover:scale-105 transition-transform duration-300`}>
-            <Icon size={28} className="text-white" strokeWidth={2} />
+          <div className={`w-14 h-14 bg-gradient-to-br ${iconBg || color} rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-gray-200/50 dark:shadow-none group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+            <Icon size={28} className="text-white drop-shadow-sm" strokeWidth={2} />
           </div>
 
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 group-hover:text-aurora-600 dark:group-hover:text-aurora-400 transition-colors">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-gray-900 group-hover:to-gray-600 dark:group-hover:from-white dark:group-hover:to-gray-300 transition-all duration-300">
             {title}
           </h3>
 
-          <p className="text-gray-600 dark:text-gray-300 mb-5 leading-relaxed text-sm">
+          <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed text-sm flex-grow">
             {description}
           </p>
 
-          <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
-            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium bg-gray-50 dark:bg-gray-700/50 px-2.5 py-1 rounded-full">
+          <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700/50 mt-auto">
+            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/30 px-3 py-1.5 rounded-full border border-gray-100 dark:border-gray-700">
               {stats}
             </span>
-            <div className="flex items-center text-aurora-600 dark:text-aurora-400 group-hover:translate-x-1 transition-transform duration-300">
-              <span className="text-sm font-medium mr-1.5">View</span>
+            <div className="flex items-center text-aurora-600 dark:text-aurora-400 group-hover:translate-x-2 transition-transform duration-300 font-medium text-sm">
+              <span className="mr-2">Explore</span>
               <ArrowRight size={16} />
             </div>
           </div>

@@ -1,48 +1,25 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import FeatureCard from '../components/FeatureCard';
-import { Users, Clock, Shield, Zap, Video, MessageCircle, FileText, Lock } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import Dashboard from './Dashboard';
+import { Users, Clock, Shield, Zap, Video, MessageCircle, FileText, Lock, ArrowRight, PlayCircle } from 'lucide-react';
+import { APP_FEATURES } from '../constants';
 
 const Home = () => {
-  const features = [
-    {
-      title: "Video Conference",
-      description: "HD video calls with screen sharing, recording, and virtual backgrounds. Support for up to 50 participants.",
-      icon: Video,
-      path: "/video-call",
-      color: "from-blue-500 via-cyan-500 to-aurora-500",
-      iconBg: "from-blue-500 to-cyan-500",
-      stats: "4.8/5 rating"
-    },
-    {
-      title: "Team Chat",
-      description: "Real-time messaging with file sharing, threads, and smart notifications. Never miss important updates.",
-      icon: MessageCircle,
-      path: "/chat",
-      color: "from-green-400 via-emerald-500 to-teal-600",
-      iconBg: "from-green-400 to-emerald-500",
-      stats: "99.9% uptime"
-    },
-    {
-      title: "Document Collaboration",
-      description: "Work together on documents with real-time editing, comments, and version history tracking.",
-      icon: FileText,
-      path: "/document-share",
-      color: "from-purple-500 via-pink-500 to-rose-500",
-      iconBg: "from-purple-500 to-pink-500",
-      stats: "2K+ active users"
-    },
-    {
-      title: "Password Manager",
-      description: "Secure storage for passwords, meeting links, and login credentials. Keep your team's information safe.",
-      icon: Lock,
-      path: "/password-manager",
-      color: "from-aurora-500 via-indigo-500 to-purple-600",
-      iconBg: "from-aurora-500 to-indigo-500",
-      stats: "Enterprise Security"
-    }
-  ];
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
+  /* -------------------------------------------------------------------------- */
+  /*                               DASHBOARD VIEW                               */
+  /* -------------------------------------------------------------------------- */
+  if (user) {
+    return <Dashboard />;
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /*                                LANDING PAGE                                */
+  /* -------------------------------------------------------------------------- */
   const stats = [
     { icon: Users, label: "Active Teams", value: "1,200+" },
     { icon: Clock, label: "Avg. Response Time", value: "< 2ms" },
@@ -50,7 +27,17 @@ const Home = () => {
     { icon: Zap, label: "Uptime", value: "99.99%" },
   ];
 
-  const navigate = useNavigate();
+  // Features are now imported from constants to ensure consistency
+  // We map them to match the Landing Page specific styling
+  const features = APP_FEATURES.map(f => ({
+    ...f,
+    stats: f.landingStats,
+    // Map colors for landing page (light theme compatible)
+    iconBg: f.title === "Video Conference" ? "bg-blue-100 dark:bg-blue-900/20" :
+      f.title === "Team Chat" ? "bg-purple-100 dark:bg-purple-900/20" :
+        f.title === "Documents" ? "bg-orange-100 dark:bg-orange-900/20" :
+          "bg-green-100 dark:bg-green-900/20"
+  }));
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 relative overflow-hidden">
@@ -84,11 +71,13 @@ const Home = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-20 animate-fade-in-up animation-delay-200">
-            <button onClick={() => navigate('/pricing')} className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-              Get Started Free
+            <button onClick={() => navigate('/pricing')} className="flex items-center justify-center bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 group">
+              <span>Get Started Free</span>
+              <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
             </button>
-            <button onClick={() => navigate('/about')} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
-              View Demo
+            <button onClick={() => navigate('/about')} className="flex items-center justify-center bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 group">
+              <PlayCircle size={20} className="mr-2 group-hover:scale-110 transition-transform" />
+              <span>View Demo</span>
             </button>
           </div>
 

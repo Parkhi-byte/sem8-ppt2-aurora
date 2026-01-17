@@ -23,49 +23,55 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (email, password, role) => {
-    // Get all users from localStorage
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const foundUser = users.find(u => u.email === email && u.password === password && u.role === role);
-    
-    if (foundUser) {
-      setUser(foundUser);
-      localStorage.setItem('user', JSON.stringify(foundUser));
-      return { success: true };
-    } else {
-      return { success: false, error: 'Invalid email, password, or role' };
+  const login = async (email, password, role) => {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Backend returns: { _id, name, email, role, token }
+        // We can verify if the role matches if needed, or just trust the backend.
+        // For now, let's just use what the backend returned.
+        setUser(data);
+        localStorage.setItem('user', JSON.stringify(data));
+        return { success: true };
+      } else {
+        return { success: false, error: data.message || 'Login failed' };
+      }
+    } catch (error) {
+      return { success: false, error: 'Network error' };
     }
   };
 
-  const signup = (name, email, password, role) => {
-    // Get all users from localStorage
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    // Check if user already exists
-    if (users.find(u => u.email === email)) {
-      return { success: false, error: 'User with this email already exists' };
+  const signup = async (name, email, password, role) => {
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password, role: role || 'member' }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUser(data);
+        localStorage.setItem('user', JSON.stringify(data));
+        return { success: true };
+      } else {
+        return { success: false, error: data.message || 'Signup failed' };
+      }
+    } catch (error) {
+      return { success: false, error: 'Network error' };
     }
-
-    // Create new user
-    const newUser = {
-      id: Date.now().toString(),
-      name,
-      email,
-      password,
-      role, // 'team_head' or 'team_member'
-      teamMembers: role === 'team_head' ? [] : [],
-      createdAt: new Date().toISOString()
-    };
-
-    // Add to users array
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-
-    // Auto login
-    setUser(newUser);
-    localStorage.setItem('user', JSON.stringify(newUser));
-
-    return { success: true };
   };
 
   const logout = () => {
@@ -73,63 +79,16 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
   };
 
-  const addTeamMember = (memberEmail, memberName) => {
-    if (!user || user.role !== 'team_head') {
-      return { success: false, error: 'Only team heads can add members' };
-    }
-
-    // Get all users
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    // Check if member exists
-    const member = users.find(u => u.email === memberEmail);
-    if (!member) {
-      return { success: false, error: 'User with this email not found' };
-    }
-
-    // Check if already in team
-    const updatedUser = { ...user };
-    if (updatedUser.teamMembers.find(m => m.email === memberEmail)) {
-      return { success: false, error: 'User is already a team member' };
-    }
-
-    // Add to team
-    updatedUser.teamMembers.push({
-      email: memberEmail,
-      name: memberName || member.name
-    });
-
-    // Update user in localStorage
-    const userIndex = users.findIndex(u => u.id === user.id);
-    users[userIndex] = updatedUser;
-    localStorage.setItem('users', JSON.stringify(users));
-
-    // Update current user
-    setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-
-    return { success: true };
+  const addTeamMember = async (memberEmail, memberName) => {
+    // Placeholder: Backend doesn't support this yet
+    console.log('addTeamMember not implemented in backend yet');
+    return { success: false, error: 'Feature coming soon' };
   };
 
-  const removeTeamMember = (memberEmail) => {
-    if (!user || user.role !== 'team_head') {
-      return { success: false, error: 'Only team heads can remove members' };
-    }
-
-    const updatedUser = { ...user };
-    updatedUser.teamMembers = updatedUser.teamMembers.filter(m => m.email !== memberEmail);
-
-    // Update user in localStorage
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const userIndex = users.findIndex(u => u.id === user.id);
-    users[userIndex] = updatedUser;
-    localStorage.setItem('users', JSON.stringify(users));
-
-    // Update current user
-    setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-
-    return { success: true };
+  const removeTeamMember = async (memberEmail) => {
+    // Placeholder: Backend doesn't support this yet
+    console.log('removeTeamMember not implemented in backend yet');
+    return { success: false, error: 'Feature coming soon' };
   };
 
   const value = {
