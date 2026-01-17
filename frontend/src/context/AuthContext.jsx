@@ -79,10 +79,28 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
   };
 
-  const addTeamMember = async (memberEmail, memberName) => {
-    // Placeholder: Backend doesn't support this yet
-    console.log('addTeamMember not implemented in backend yet');
-    return { success: false, error: 'Feature coming soon' };
+  const addTeamMember = async (memberEmail) => {
+    try {
+      const token = user?.token || JSON.parse(localStorage.getItem('user'))?.token;
+      const response = await fetch('/api/team', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ email: memberEmail }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        return { success: true, data };
+      } else {
+        return { success: false, error: data.message || 'Failed to add member' };
+      }
+    } catch (error) {
+      return { success: false, error: 'Network error' };
+    }
   };
 
   const removeTeamMember = async (memberEmail) => {

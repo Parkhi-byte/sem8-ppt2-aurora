@@ -15,13 +15,13 @@ const getTeamMembers = asyncHandler(async (req, res) => {
 
     const teams = [];
 
-    // Add Owned Team if it has members or if the user is an admin (even empty)
-    if (currentUser.role === 'admin' || currentUser.teamMembers.length > 0) {
+    // Add Owned Team if it has members or if the user is an admin or team_head
+    if (currentUser.role === 'admin' || currentUser.role === 'team_head' || currentUser.teamMembers.length > 0) {
         teams.push({
             id: currentUser._id.toString(),
             name: 'My Team', // Or currentUser.name + "'s Team"
             description: 'Team managed by you',
-            members: currentUser.teamMembers.map(m => ({
+            members: currentUser.teamMembers.filter(m => m !== null).map(m => ({
                 _id: m._id,
                 name: m.name,
                 email: m.email,
@@ -40,7 +40,7 @@ const getTeamMembers = asyncHandler(async (req, res) => {
             id: boss._id.toString(),
             name: `${boss.name || boss.email}'s Team`,
             description: `Managed by ${boss.name || boss.email}`,
-            members: boss.teamMembers.map(m => ({
+            members: boss.teamMembers.filter(m => m !== null).map(m => ({
                 _id: m._id,
                 name: m.name,
                 email: m.email,
