@@ -7,6 +7,7 @@ export const useTeamManagement = () => {
     // State management
     const [teams, setTeams] = useState([]);
     const [currentTeamId, setCurrentTeamId] = useState(null);
+    const [activities, setActivities] = useState([]); // Add activities state
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -70,11 +71,32 @@ export const useTeamManagement = () => {
         }
     };
 
+    // Fetch Activities
+    const fetchActivities = async (teamId) => {
+        if (!teamId) return;
+        try {
+            const token = user?.token || JSON.parse(localStorage.getItem('user'))?.token;
+            const res = await fetch(`/api/team/activity/${teamId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (res.ok) setActivities(data);
+        } catch (err) {
+            console.error("Failed to fetch activities", err);
+        }
+    };
+
     useEffect(() => {
         if (user) {
             fetchTeams();
         }
     }, [user]);
+
+    useEffect(() => {
+        if (currentTeamId) {
+            fetchActivities(currentTeamId);
+        }
+    }, [currentTeamId]);
 
 
     // Derived State
@@ -176,6 +198,7 @@ export const useTeamManagement = () => {
 
                 setSuccess(`Invited ${inviteEmail} successfully!`);
                 setInviteEmail('');
+                fetchActivities(currentTeamId); // Refresh activities
             } else {
                 setError(data.message || 'Failed to invite member');
             }
@@ -212,6 +235,7 @@ export const useTeamManagement = () => {
                         return t;
                     }));
                     setSuccess('Member removed from team.');
+                    fetchActivities(currentTeamId); // Refresh activities
                 } else {
                     const data = await res.json();
                     setError(data.message || 'Failed to remove member');
@@ -356,6 +380,7 @@ export const useTeamManagement = () => {
         handleInvite,
         handleRemoveMember,
         updateTeamDetails,
-        deleteTeam
+        deleteTeam,
+        activities
     };
 };

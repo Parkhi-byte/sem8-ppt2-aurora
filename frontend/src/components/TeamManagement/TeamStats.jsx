@@ -64,7 +64,7 @@ const TeamStats = ({ stats, activities }) => {
                                 <div className="flex flex-col">
                                     <p className="text-gray-600 dark:text-gray-400 leading-snug">
                                         <span className="font-bold text-gray-900 dark:text-white group-hover:text-indigo-500 transition-colors cursor-pointer capitalize">
-                                            User
+                                            {/* Dynamic Activity Icon or Type?? */}
                                         </span> {act.text}
                                     </p>
                                     <span className="text-[10px] text-gray-400 font-medium">

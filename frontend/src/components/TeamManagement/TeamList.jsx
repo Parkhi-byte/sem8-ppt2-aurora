@@ -33,7 +33,7 @@ const TeamList = ({ filteredMembers, teamMembers, searchTerm, setSearchTerm, hov
                             key={member._id}
                             onMouseEnter={() => setHoveredMember(member._id)}
                             onMouseLeave={() => setHoveredMember(null)}
-                            className="group relative bg-white dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 rounded-3xl p-5 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 shadow-sm hover:shadow-xl transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
+                            className="group relative bg-white dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 rounded-3xl p-5 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 shadow-sm hover:shadow-xl hover:z-20 transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
                             style={{ animationDelay: `${idx * 50}ms` }}
                         >
                             <div className="flex items-center justify-between">
@@ -52,7 +52,7 @@ const TeamList = ({ filteredMembers, teamMembers, searchTerm, setSearchTerm, hov
                                     </div>
 
                                     <div>
-                                        <h4 className="font-bold text-gray-900 dark:text-white text-lg flex items-center gap-2">
+                                        <h4 className="font-bold text-gray-900 dark:text-white text-lg flex items-center gap-2 group-hover:text-indigo-500 transition-colors cursor-pointer">
                                             {member.name || 'Anonymous User'}
                                             {member.role === 'admin' && (
                                                 <BadgeCheck size={18} className="text-violet-500" fill="currentColor" />
@@ -69,12 +69,12 @@ const TeamList = ({ filteredMembers, teamMembers, searchTerm, setSearchTerm, hov
                                 <div className="hidden md:flex flex-col items-center px-4 w-40">
                                     <div className="w-full flex justify-between text-xs font-bold text-gray-500 mb-1">
                                         <span>Tasks</span>
-                                        <span>{Math.round((member.tasksCompleted / (member.tasksAssigned || 1)) * 100)}%</span>
+                                        <span>{member.tasksAssigned > 0 ? Math.min(100, Math.round((member.tasksCompleted / member.tasksAssigned) * 100)) : 0}%</span>
                                     </div>
                                     <div className="w-full bg-gray-100 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
                                         <div
                                             className="h-full bg-gradient-to-r from-blue-400 to-indigo-500"
-                                            style={{ width: `${Math.min(100, (member.tasksCompleted / (member.tasksAssigned || 1)) * 100)}%` }}
+                                            style={{ width: `${member.tasksAssigned > 0 ? Math.min(100, (member.tasksCompleted / member.tasksAssigned) * 100) : 0}%` }}
                                         ></div>
                                     </div>
                                     <div className="mt-1 text-xs text-gray-400">
@@ -92,21 +92,44 @@ const TeamList = ({ filteredMembers, teamMembers, searchTerm, setSearchTerm, hov
                                     </div>
 
                                     {/* Actions */}
-                                    {handleRemoveMember && (
-                                        <div className={`flex items-center space-x-2 transition-all duration-300 ${hoveredMember === member._id ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'
-                                            }`}>
-                                            <button
-                                                onClick={() => handleRemoveMember(member._id)}
-                                                className="p-3 bg-red-50 text-red-600 hover:bg-red-500 hover:text-white hover:shadow-lg dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-600 dark:hover:text-white rounded-2xl transition-all duration-300"
-                                                title="Remove User"
-                                            >
-                                                <X size={18} />
-                                            </button>
+                                    <div className={`flex items-center space-x-2 transition-all duration-300 ${hoveredMember === member._id ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-3'}`}>
+                                        <div className="relative group/menu">
                                             <button className="p-3 bg-gray-50 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 rounded-2xl transition-colors">
                                                 <MoreHorizontal size={18} />
                                             </button>
+                                            {/* Dropdown Menu */}
+                                            <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all duration-200 z-50 transform origin-top-right overflow-hidden">
+                                                <div className="p-1.5 flex flex-col gap-1">
+                                                    <button className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors" onClick={() => alert('View Profile feature coming soon')}>
+                                                        View Profile
+                                                    </button>
+                                                    <button className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors" onClick={() => alert('Message feature coming soon')}>
+                                                        Message
+                                                    </button>
+                                                    <button className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors" onClick={() => alert('Assign Task feature coming soon')}>
+                                                        Assign Task
+                                                    </button>
+                                                    <button className="w-full text-left px-3 py-2 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors" onClick={() => alert(`Manage Role feature coming soon. Current role: ${member.role}`)}>
+                                                        Manage Role
+                                                    </button>
+
+                                                    {handleRemoveMember && (
+                                                        <div className="h-px bg-gray-100 dark:bg-gray-700 my-1"></div>
+                                                    )}
+
+                                                    {handleRemoveMember && (
+                                                        <button
+                                                            className="w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex items-center gap-2"
+                                                            onClick={() => handleRemoveMember(member._id)}
+                                                        >
+                                                            <X size={14} />
+                                                            Remove from Team
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
-                                    )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
