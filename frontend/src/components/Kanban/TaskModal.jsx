@@ -58,7 +58,7 @@ const TaskModal = ({ isOpen, onClose, title, formData, handleSaveTask, editingTa
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         transition={{ duration: 0.2 }}
-                        className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-lg shadow-2xl border border-gray-100 dark:border-gray-800"
+                        className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-lg shadow-2xl border border-gray-100 dark:border-gray-800 max-h-[90vh] overflow-y-auto custom-scrollbar"
                     >
                         <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800">
                             <div>
