@@ -30,6 +30,8 @@ export const useKanban = () => {
         tag: 'General'
     });
 
+    const [teamMembers, setTeamMembers] = useState([]);
+
     const fetchTasks = useCallback(async () => {
         if (!user || !user.token) return;
         try {
@@ -38,8 +40,33 @@ export const useKanban = () => {
             });
             const data = await response.json();
             if (response.ok) setTasks(data);
+
+            // Also fetch team members for assignment (if head/admin)
+            // Even members might need to see who is on the team, but assignment is restricted.
+            // We fetch teams to get members.
+            const teamResponse = await fetch('/api/team', {
+                headers: { 'Authorization': `Bearer ${user.token}` },
+            });
+            const teamData = await teamResponse.json();
+
+            if (teamResponse.ok) {
+                // Aggregate members from all teams
+                const allMembers = [];
+                const seenEmails = new Set();
+
+                teamData.forEach(team => {
+                    team.members.forEach(member => {
+                        if (!seenEmails.has(member.email)) {
+                            seenEmails.add(member.email);
+                            allMembers.push(member);
+                        }
+                    });
+                });
+                setTeamMembers(allMembers);
+            }
+
         } catch (error) {
-            console.error('Error fetching tasks:', error);
+            console.error('Error fetching data:', error);
             toast.error('Failed to fetch tasks');
         } finally {
             setLoading(false);
@@ -171,7 +198,8 @@ export const useKanban = () => {
                 description: '',
                 priority: 'medium',
                 status: statusOrTask,
-                tag: 'General'
+                tag: 'General',
+                assignedTo: ''
             });
         } else {
             setEditingTask(statusOrTask);
@@ -180,7 +208,8 @@ export const useKanban = () => {
                 description: statusOrTask.description,
                 priority: statusOrTask.priority,
                 status: statusOrTask.status,
-                tag: statusOrTask.tag || 'General'
+                tag: statusOrTask.tag || 'General',
+                assignedTo: statusOrTask.assignedTo?._id || ''
             });
         }
         setIsModalOpen(true);
@@ -237,7 +266,7 @@ export const useKanban = () => {
 
     return {
         tasks, loading, isModalOpen, editingTask, showAnalytics, setShowAnalytics, searchQuery, setSearchQuery, filterPriority, setFilterPriority, formData, setFormData,
-        groupedTasks, stats, priorityData, statusData,
+        groupedTasks, stats, priorityData, statusData, teamMembers,
         onDragEnd, handleDeleteTask, openModal, closeModal, handleSaveTask
     };
 }

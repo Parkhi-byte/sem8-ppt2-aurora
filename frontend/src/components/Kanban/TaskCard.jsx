@@ -59,6 +59,15 @@ const TaskCard = React.memo(({ task, index, onEdit, onDelete }) => {
                             <span>{new Date(task.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
                         </div>
                     </div>
+
+                    {task.assignedTo && (
+                        <div className="pt-2 mt-2 border-t border-gray-50 dark:border-gray-700/50 pl-2 flex justify-end">
+                            <span className="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                {task.assignedTo.name}
+                            </span>
+                        </div>
+                    )}
                 </div>
             )}
         </Draggable>

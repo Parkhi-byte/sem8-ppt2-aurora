@@ -6,6 +6,14 @@ const taskSchema = mongoose.Schema({
         required: true,
         ref: 'User',
     },
+    assignedTo: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User', // The member who is responsible for this task
+    },
+    team: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Team', // The team this task belongs to
+    },
     title: {
         type: String,
         required: [true, 'Please add a task title'],

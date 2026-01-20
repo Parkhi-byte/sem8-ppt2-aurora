@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X, Filter, Tag, Check, ChevronDown } from 'lucide-react';
+import { X, Filter, Tag, Check, ChevronDown, User } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -11,7 +11,8 @@ const schema = z.object({
     description: z.string().optional(),
     priority: z.string(),
     tag: z.string().optional(),
-    status: z.string().optional()
+    status: z.string().optional(),
+    assignedTo: z.string().optional()
 });
 
 const PRIORITY_OPTIONS = [
@@ -20,7 +21,7 @@ const PRIORITY_OPTIONS = [
     { value: 'high', label: 'High Priority', color: 'bg-red-100 text-red-700' }
 ];
 
-const TaskModal = ({ isOpen, onClose, title, formData, handleSaveTask, editingTask }) => {
+const TaskModal = ({ isOpen, onClose, title, formData, handleSaveTask, editingTask, teamMembers = [] }) => {
     const {
         register,
         handleSubmit,
@@ -39,23 +40,6 @@ const TaskModal = ({ isOpen, onClose, title, formData, handleSaveTask, editingTa
     }, [formData, isOpen, reset]);
 
     const onSubmit = (data) => {
-        // Adapt data to match what handleSaveTask expects (synthetic event)
-        // or refactor handleSaveTask. Since handleSaveTask preventsDefault, we can wrap it.
-        // Actually, let's adjust handleSaveTask in useKanban to accept data, 
-        // OR we can mock an event.
-        // Better: refactor useKanban to accept data, but for now let's keep it safe.
-        // Wait, I refactored usePasswordManager, why not useKanban?
-        // I should refactor useKanban.js handleSaveTask to accept 'data' argument too!
-        // For this step I will assume handleSaveTask receives an event. 
-        // Wait, hook forms handles submit.
-        // Let's change handleSaveTask in useKanban to accept data object.
-        // I will do that in next step. For now, let's write this component assuming it passes data.
-
-        // *Correction*: usage in Kanban.jsx passes handleSaveTask directly to form onSubmit.
-        // I need to change how it is called.
-        // I will make onSubmit call a modified handler or assume handleSaveTask will be updated.
-        // Let's update handleSaveTask in useKanban.js *first* or *parallel*. 
-        // I'll assume handleSaveTask will take (data) as arg.
         handleSaveTask(data);
     };
 
@@ -100,7 +84,7 @@ const TaskModal = ({ isOpen, onClose, title, formData, handleSaveTask, editingTa
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Description</label>
                                     <textarea
-                                        rows={4}
+                                        rows={3}
                                         {...register('description')}
                                         className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-gray-900 dark:text-white transition-all text-sm font-medium resize-none"
                                         placeholder="Add some details..."
@@ -133,7 +117,7 @@ const TaskModal = ({ isOpen, onClose, title, formData, handleSaveTask, editingTa
                                                             leaveFrom="opacity-100"
                                                             leaveTo="opacity-0"
                                                         >
-                                                            <Listbox.Options className="absolute z-10 bottom-full mb-1 max-h-60 w-full overflow-auto rounded-xl bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm border border-gray-100 dark:border-gray-700">
+                                                            <Listbox.Options className="absolute z-10 top-full mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm border border-gray-100 dark:border-gray-700">
                                                                 {PRIORITY_OPTIONS.map((priority, priorityIdx) => (
                                                                     <Listbox.Option
                                                                         key={priorityIdx}
@@ -183,6 +167,84 @@ const TaskModal = ({ isOpen, onClose, title, formData, handleSaveTask, editingTa
                                         </div>
                                     </div>
                                 </div>
+
+                                {teamMembers && teamMembers.length > 0 && (
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Assign To</label>
+                                        <Controller
+                                            name="assignedTo"
+                                            control={control}
+                                            render={({ field }) => (
+                                                <Listbox value={field.value} onChange={field.onChange}>
+                                                    <div className="relative mt-1">
+                                                        <Listbox.Button className="relative w-full cursor-default rounded-xl bg-gray-50 dark:bg-gray-800 py-3 pl-10 pr-10 text-left border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 sm:text-sm text-gray-900 dark:text-white transition-all">
+                                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                                <User className="h-5 w-5 text-gray-400" />
+                                                            </div>
+                                                            <span className="block truncate">
+                                                                {teamMembers.find(m => m._id === field.value)?.name || 'Unassigned'}
+                                                            </span>
+                                                            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                                                <ChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                                            </span>
+                                                        </Listbox.Button>
+                                                        <Transition
+                                                            as={React.Fragment}
+                                                            leave="transition ease-in duration-100"
+                                                            leaveFrom="opacity-100"
+                                                            leaveTo="opacity-0"
+                                                        >
+                                                            <Listbox.Options className="absolute z-10 bottom-full mb-1 max-h-60 w-full overflow-auto rounded-xl bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm border border-gray-100 dark:border-gray-700">
+                                                                <Listbox.Option
+                                                                    key="unassigned"
+                                                                    className={({ active }) =>
+                                                                        `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-300' : 'text-gray-900 dark:text-gray-100'
+                                                                        }`
+                                                                    }
+                                                                    value=""
+                                                                >
+                                                                    {({ selected }) => (
+                                                                        <>
+                                                                            <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>Unassigned</span>
+                                                                            {selected ? (
+                                                                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600 dark:text-blue-400">
+                                                                                    <Check className="h-5 w-5" aria-hidden="true" />
+                                                                                </span>
+                                                                            ) : null}
+                                                                        </>
+                                                                    )}
+                                                                </Listbox.Option>
+                                                                {teamMembers.map((member) => (
+                                                                    <Listbox.Option
+                                                                        key={member._id}
+                                                                        className={({ active }) =>
+                                                                            `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-300' : 'text-gray-900 dark:text-gray-100'
+                                                                            }`
+                                                                        }
+                                                                        value={member._id}
+                                                                    >
+                                                                        {({ selected }) => (
+                                                                            <>
+                                                                                <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                                                                                    {member.name} ({member.email})
+                                                                                </span>
+                                                                                {selected ? (
+                                                                                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600 dark:text-blue-400">
+                                                                                        <Check className="h-5 w-5" aria-hidden="true" />
+                                                                                    </span>
+                                                                                ) : null}
+                                                                            </>
+                                                                        )}
+                                                                    </Listbox.Option>
+                                                                ))}
+                                                            </Listbox.Options>
+                                                        </Transition>
+                                                    </div>
+                                                </Listbox>
+                                            )}
+                                        />
+                                    </div>
+                                )}
 
                                 <div className="flex justify-end pt-6 gap-3 border-t border-gray-100 dark:border-gray-800 mt-6">
                                     <button

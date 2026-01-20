@@ -11,7 +11,7 @@ import { DragDropContext } from '@hello-pangea/dnd';
 const Kanban = () => {
   const {
     loading, isModalOpen, editingTask, showAnalytics, setShowAnalytics, searchQuery, setSearchQuery, filterPriority, setFilterPriority, formData, setFormData,
-    groupedTasks, stats, priorityData, statusData,
+    groupedTasks, stats, priorityData, statusData, teamMembers,
     onDragEnd, handleDeleteTask, openModal, closeModal, handleSaveTask
   } = useKanban();
 
@@ -197,6 +197,7 @@ const Kanban = () => {
         setFormData={setFormData}
         handleSaveTask={handleSaveTask}
         editingTask={editingTask}
+        teamMembers={teamMembers}
       />
     </div>
   );
